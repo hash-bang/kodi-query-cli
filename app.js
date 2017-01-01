@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var async = require('async-chainable');
+var asyncFlush = require('async-chainable-flush');
 var colors = require('colors');
 var kodi = require('kodi-ws');
 var program = require('commander');
@@ -19,6 +20,7 @@ program
 	.parse(process.argv);
 
 async()
+	.use(asyncFlush)
 	// Sanity checks {{{
 	.set('renderer', '')
 	.then(function(next) {
@@ -86,7 +88,13 @@ async()
 	})
 	// }}}
 	// End {{{
+	.flush()
 	.end(function(err) {
-		if (err) return console.log(colors.red('ERROR'), err.toString());
+		if (err) {
+			console.log(colors.red('ERROR'), err.toString());
+			process.exit(1);
+		} else {
+			process.exit(0);
+		}
 	});
 	// }}}
