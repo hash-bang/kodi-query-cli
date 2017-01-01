@@ -1,10 +1,11 @@
 {
-  "name": "kodi-listings-cli",
+  "name": "kodi-query-cli",
   "version": "0.0.0",
-  "description": "Command line interface to get listings from a Kodi server",
+  "description": "Command line interface to query listings from a Kodi server",
   "main": "index.js",
   "dependencies": {
     "async-chainable": "^2.2.3",
+    "async-chainable-flush": "^1.0.0",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
     "kodi-ws": "^2.4.3",
