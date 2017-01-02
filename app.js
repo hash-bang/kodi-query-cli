@@ -14,7 +14,8 @@ program
 	.option('-p, --port [number]', 'Specify the Kodi host port (default: 9090)', 9090)
 	.option('-o, --output [renderer]', 'Set the output renderer. Values: json')
 	.option('-v, --verbose', 'Be verbose')
-	.option('--fields [csv]', 'Fields to request as a CSV')
+	.option('--type [csv]', 'What types to query as a CSV (default: "movies,tv")', 'movies,tv')
+	.option('--fields [csv]', 'Fields to request as a CSV (default: "title,year,file,fanart,plot,cast")', 'title,year,file,fanart,plot,cast')
 	.option('--start [number]', 'Start at a given offset', parseInt)
 	.option('--end [number]', 'End at a given offset', parseInt)
 	.parse(process.argv);
@@ -26,6 +27,7 @@ async()
 	.then(function(next) {
 		if (!program.host) return next('No host specified. Set with --host <address>');
 		if (!program.port) return next('No port specified. Set with --port <number>');
+		program.type = program.type.split(/\s*,\s*/).map(i => i.toLowerCase());
 		this.renderer = require(__dirname + '/renderers/' + program.output);
 		next();
 	})
@@ -33,17 +35,14 @@ async()
 	// Form the query {{{
 	.then('query', function(next) {
 		var q = {};
-		if (!program.fields) {
-			q.properties = ['title', 'year', 'file', 'fanart', 'plot', 'cast'];
-		} else {
-			q.properties = program.fields.split(/\s*,\s*/);
-		}
+		if (program.fields) q.properties = program.fields.split(/\s*,\s*/).map(i => i.toLowerCase());
 
 		if (program.start || program.end) {
 			q.limits = {};
 			if (program.start) q.limits.start = program.start;
 			if (program.end) q.limits.end = program.end;
 		}
+
 		next(null, q);
 	})
 	// }}}
@@ -57,6 +56,7 @@ async()
 	// Fetch items based on path {{{
 	.parallel({
 		movies: function(next) {
+			if (!_.includes(program.type, 'movies')) return next(null, []);
 			this.connection.VideoLibrary.GetMovies(this.query)
 				.then(data => next(null, data.movies.map(d => {
 					delete d.label;
@@ -66,9 +66,9 @@ async()
 				.catch(next)
 		},
 		tv: function(next) {
-			return next();
+			if (!_.includes(program.type, 'tv')) return next(null, []);
 			this.connection.VideoLibrary.GetTVShows(this.query)
-				.then(data => next(null, data.tv.map(d => {
+				.then(data => next(null, data.tvshows.map(d => {
 					delete d.label;
 					d.type = 'tv';
 					return d;
