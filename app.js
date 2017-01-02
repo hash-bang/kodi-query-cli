@@ -5,6 +5,7 @@ var async = require('async-chainable');
 var asyncFlush = require('async-chainable-flush');
 var colors = require('colors');
 var kodi = require('kodi-ws');
+var fspath = require('path');
 var program = require('commander');
 
 program
@@ -14,6 +15,7 @@ program
 	.option('-p, --port [number]', 'Specify the Kodi host port (default: 9090)', 9090)
 	.option('-o, --output [renderer]', 'Set the output renderer. Values: json')
 	.option('-v, --verbose', 'Be verbose')
+	.option('--filter-by [field]', 'Filter output by a specified field (e.g. "basename" to filter only matching file basenames)')
 	.option('--type [csv]', 'What types to query as a CSV (default: "movies,tv")', 'movies,tv')
 	.option('--fields [csv]', 'Fields to request as a CSV (default: "title,year,file,fanart,plot,cast")', 'title,year,file,fanart,plot,cast')
 	.option('--start [number]', 'Start at a given offset', parseInt)
@@ -80,6 +82,19 @@ async()
 	// Merge all data into one array {{{
 	.then('data', function(next) {
 		next(null, [].concat(this.movies, this.tv));
+	})
+	// }}}
+	// Apply filter-by {{{
+	.then('data', function(next) {
+		if (!program.filterBy) return next(null, this.data);
+		switch (program.filterBy) {
+			case 'basename':
+				var baseArgs = program.args.map(i => fspath.basename(i));
+				return next(null, this.data.filter(i => _.includes(baseArgs, fspath.basename(i.file))));
+			default:
+				console.log('Unknown filter:', program.filterBy);
+				return next(null, this.data);
+		}
 	})
 	// }}}
 	// Render the output {{{
