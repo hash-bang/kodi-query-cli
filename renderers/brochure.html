@@ -1,0 +1,35 @@
+<html>
+<head>
+	<title>Kodi-Query</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+<body>
+{{#each items}}
+<div class="row">
+	<div class="media col-xs-12">
+		<div class="media-left col-xs-2">
+			<div class="thumbnail">
+				<img class="media-object" src="{{decodeUrl thumbnail}}"/>
+			</div>
+		</div>
+		<div class="media-body">
+			<h2 class="media-heading">
+				<div class="pull-right" style="font-size: 20px; margin-top: 10px">
+					<img src="https://upload.wikimedia.org/wikipedia/commons/3/35/IMDb_logo.svg" height="25px">
+					{{round rating 1}}
+				</div>
+				{{title}} ({{year}})
+			</h2>
+			<div>
+				{{#each (head 3 cast)}}
+					<span class="badge badge-default">{{name}}</span>
+				{{/each}}
+			</div>
+			<div>{{plot}}</div>
+		</div>
+	</div>
+</div>
+{{/each}}
+</body>
+</html>
+

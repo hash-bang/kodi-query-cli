@@ -17,7 +17,7 @@ program
 	.option('-v, --verbose', 'Be verbose')
 	.option('--filter-by [field]', 'Filter output by a specified field (e.g. "basename" to filter only matching file basenames)')
 	.option('--type [csv]', 'What types to query as a CSV (default: "movies,tv")', 'movies,tv')
-	.option('--fields [csv]', 'Fields to request as a CSV (default: "title,year,file,fanart,plot,cast")', 'title,year,file,fanart,plot,cast')
+	.option('--fields [csv]', 'Fields to request as a CSV (default: "title,year,file,thumbnail,plot,cast,rating")', 'title,year,file,thumbnail,plot,cast,rating')
 	.option('--start [number]', 'Start at a given offset', parseInt)
 	.option('--end [number]', 'End at a given offset', parseInt)
 	.parse(process.argv);
