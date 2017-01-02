@@ -18,6 +18,7 @@ program
 	.option('--filter-by [field]', 'Filter output by a specified field (e.g. "basename" to filter only matching file basenames)')
 	.option('--type [csv]', 'What types to query as a CSV (default: "movies,tv")', 'movies,tv')
 	.option('--fields [csv]', 'Fields to request as a CSV (default: "title,year,file,thumbnail,plot,cast,rating")', 'title,year,file,thumbnail,plot,cast,rating')
+	.option('--sort [csv]', 'Fields to sort the output by as a CSV (default: "title,year")', 'title,year')
 	.option('--start [number]', 'Start at a given offset', parseInt)
 	.option('--end [number]', 'End at a given offset', parseInt)
 	.parse(process.argv);
@@ -30,6 +31,7 @@ async()
 		if (!program.host) return next('No host specified. Set with --host <address>');
 		if (!program.port) return next('No port specified. Set with --port <number>');
 		program.type = program.type.split(/\s*,\s*/).map(i => i.toLowerCase());
+		program.sort = program.sort.split(/\s*,\s*/).map(i => i.toLowerCase());
 		this.renderer = require(__dirname + '/renderers/' + program.output);
 		next();
 	})
@@ -95,6 +97,11 @@ async()
 				console.log('Unknown filter:', program.filterBy);
 				return next(null, this.data);
 		}
+	})
+	// }}}
+	// Apply sorting {{{
+	.then('data', function(next) {
+		next(null, _.sortBy(this.data, program.sort));
 	})
 	// }}}
 	// Render the output {{{
